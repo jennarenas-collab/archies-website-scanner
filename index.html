@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>AdWatch — Archies Brand Monitor</title>
+<title>AdWatch — Brand Ad Monitor</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@400;500;600;700&display=swap');
 
@@ -19,6 +19,10 @@
     --red-dim:   #7f1d1d;
     --yellow:    #eab308;
     --yellow-dim:#713f12;
+    --blue:      #60a5fa;
+    --blue-dim:  #1e3a5f;
+    --purple:    #a78bfa;
+    --purple-dim:#3b2f6e;
     --text:      #e6edf3;
     --muted:     #8b949e;
     --mono:      'IBM Plex Mono', monospace;
@@ -34,7 +38,6 @@
     min-height: 100vh;
   }
 
-  /* ── Header ─────────────────────────────────── */
   header {
     display: flex;
     align-items: center;
@@ -54,7 +57,6 @@
     font-family: var(--mono);
     font-weight: 600;
     font-size: 17px;
-    letter-spacing: -0.3px;
   }
 
   .logo-dot {
@@ -65,9 +67,12 @@
     animation: pulse 2s ease-in-out infinite;
   }
 
-  @keyframes pulse {
-    0%,100% { opacity: 1; }
-    50%      { opacity: 0.4; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.35} }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
   }
 
   .header-meta {
@@ -76,49 +81,64 @@
     color: var(--muted);
   }
 
-  /* ── Layout ──────────────────────────────────── */
+  .credits-badge {
+    font-family: var(--mono);
+    font-size: 11px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 10px;
+    color: var(--muted);
+  }
+
   main {
-    max-width: 1080px;
+    max-width: 1100px;
     margin: 0 auto;
     padding: 32px 24px;
     display: flex;
     flex-direction: column;
-    gap: 28px;
+    gap: 24px;
   }
 
-  /* ── Config Panel ────────────────────────────── */
   .panel {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 10px;
-    padding: 24px;
+    padding: 22px 24px;
   }
 
   .panel-title {
-    font-size: 11px;
+    font-size: 10px;
     font-family: var(--mono);
-    letter-spacing: 1.5px;
+    letter-spacing: 1.8px;
     text-transform: uppercase;
     color: var(--muted);
-    margin-bottom: 18px;
+    margin-bottom: 16px;
   }
 
   .config-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    gap: 14px;
   }
 
-  @media (max-width: 600px) {
-    .config-grid { grid-template-columns: 1fr; }
-  }
+  @media (max-width: 620px) { .config-grid { grid-template-columns: 1fr; } }
 
   .field label {
     display: block;
-    font-size: 12px;
+    font-size: 11px;
     color: var(--muted);
     margin-bottom: 6px;
     font-family: var(--mono);
+    letter-spacing: 0.4px;
+  }
+
+  .field-hint {
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 5px;
+    font-family: var(--mono);
+    opacity: 0.7;
   }
 
   .field input, .field select {
@@ -134,18 +154,38 @@
     transition: border-color 0.15s;
   }
 
-  .field input:focus, .field select:focus {
-    border-color: var(--accent);
-  }
-
+  .field input:focus, .field select:focus { border-color: var(--accent); }
   .field input::placeholder { color: var(--muted); }
 
-  /* ── Keywords ────────────────────────────────── */
-  .keywords-row {
+  /* API key row */
+  .api-key-row {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+  }
+
+  .api-key-row input { flex: 1; }
+
+  .btn-icon {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--muted);
+    padding: 0 12px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: border-color .15s, color .15s;
+    white-space: nowrap;
+  }
+
+  .btn-icon:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Keywords */
+  .kw-tags {
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
-    margin-top: 4px;
+    min-height: 32px;
   }
 
   .kw-tag {
@@ -154,26 +194,27 @@
     gap: 6px;
     background: var(--accent-dim);
     color: var(--accent);
-    border: 1px solid var(--accent-dim);
+    border: 1px solid #a0450f44;
     border-radius: 100px;
     font-family: var(--mono);
     font-size: 12px;
-    padding: 4px 12px;
-    cursor: default;
+    padding: 4px 10px 4px 13px;
   }
 
   .kw-tag button {
-    background: none;
-    border: none;
-    color: var(--accent);
-    cursor: pointer;
-    font-size: 14px;
-    line-height: 1;
-    padding: 0;
-    opacity: 0.7;
+    background: none; border: none;
+    color: var(--accent); cursor: pointer;
+    font-size: 15px; line-height: 1; padding: 0; opacity: .6;
   }
 
   .kw-tag button:hover { opacity: 1; }
+
+  .kw-empty {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--muted);
+    align-self: center;
+  }
 
   .kw-add-row {
     display: flex;
@@ -195,12 +236,8 @@
 
   .kw-add-row input:focus { border-color: var(--accent); }
 
-  /* ── Regions ─────────────────────────────────── */
-  .region-list {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-  }
+  /* Regions */
+  .region-list { display: flex; gap: 10px; flex-wrap: wrap; }
 
   .region-btn {
     display: flex;
@@ -214,22 +251,23 @@
     font-size: 12px;
     padding: 8px 14px;
     cursor: pointer;
-    transition: all 0.15s;
+    transition: all .15s;
+    user-select: none;
   }
 
   .region-btn.active {
     background: #1a2332;
-    border-color: #3b82f6;
-    color: #60a5fa;
+    border-color: var(--blue);
+    color: var(--blue);
   }
 
   .region-btn .flag { font-size: 16px; }
 
-  /* ── Run Button ──────────────────────────────── */
+  /* Run row */
   .run-row {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 14px;
     flex-wrap: wrap;
   }
 
@@ -246,11 +284,11 @@
     border-radius: 8px;
     padding: 12px 24px;
     cursor: pointer;
-    transition: opacity 0.15s;
+    transition: opacity .15s;
   }
 
-  .btn-run:hover { opacity: 0.88; }
-  .btn-run:disabled { opacity: 0.45; cursor: not-allowed; }
+  .btn-run:hover { opacity: .88; }
+  .btn-run:disabled { opacity: .4; cursor: not-allowed; }
 
   .btn-outline {
     background: none;
@@ -261,12 +299,11 @@
     border-radius: 8px;
     padding: 10px 18px;
     cursor: pointer;
-    transition: border-color 0.15s, color 0.15s;
+    transition: border-color .15s, color .15s;
   }
 
   .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
 
-  /* ── Status Bar ──────────────────────────────── */
   #status-bar {
     font-family: var(--mono);
     font-size: 12px;
@@ -276,47 +313,67 @@
     gap: 8px;
   }
 
-  #status-bar .spinner {
+  .spinner {
     width: 12px; height: 12px;
     border: 2px solid var(--border);
     border-top-color: var(--accent);
     border-radius: 50%;
-    animation: spin 0.7s linear infinite;
+    animation: spin .7s linear infinite;
     display: none;
   }
 
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* ── Summary Badges ──────────────────────────── */
+  /* Scan log */
+  #scan-log {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px 14px;
+    line-height: 1.9;
+    max-height: 130px;
+    overflow-y: auto;
+    display: none;
+    margin-top: 14px;
+  }
+
+  .log-ok   { color: var(--green); }
+  .log-err  { color: var(--red); }
+  .log-info { color: var(--blue); }
+  .log-warn { color: var(--yellow); }
+
+  /* Summary */
   .summary-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 14px;
+    gap: 12px;
   }
 
-  @media (max-width: 600px) {
-    .summary-grid { grid-template-columns: 1fr 1fr; }
-  }
+  @media (max-width: 620px) { .summary-grid { grid-template-columns: 1fr 1fr; } }
 
   .stat-card {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 10px;
-    padding: 18px 20px;
+    padding: 16px 20px;
   }
 
-  .stat-card .stat-num {
+  .stat-num {
     font-family: var(--mono);
-    font-size: 28px;
+    font-size: 30px;
     font-weight: 600;
     line-height: 1;
   }
 
-  .stat-card .stat-label {
-    font-size: 11px;
+  .stat-label {
+    font-size: 10px;
     color: var(--muted);
     margin-top: 6px;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.8px;
+    font-family: var(--mono);
   }
 
   .stat-card.danger  .stat-num { color: var(--red); }
@@ -324,46 +381,43 @@
   .stat-card.ok      .stat-num { color: var(--green); }
   .stat-card.neutral .stat-num { color: var(--accent); }
 
-  /* ── Results Table ───────────────────────────── */
-  .results-area {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
+  /* Filters */
   .results-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
   }
 
-  .filter-row {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
+  .filter-row { display: flex; gap: 8px; flex-wrap: wrap; }
 
   .filter-btn {
     font-family: var(--mono);
     font-size: 11px;
-    padding: 5px 12px;
+    padding: 5px 13px;
     border-radius: 100px;
     border: 1px solid var(--border);
     background: none;
     color: var(--muted);
     cursor: pointer;
-    transition: all 0.12s;
+    transition: all .12s;
   }
 
-  .filter-btn.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+  .filter-btn.active {
+    background: var(--accent-dim);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
 
-  /* ── Result Card ─────────────────────────────── */
+  /* Result card */
   .result-card {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 10px;
     overflow: hidden;
-    transition: border-color 0.15s;
+    margin-bottom: 10px;
+    transition: border-color .15s;
   }
 
   .result-card:hover { border-color: #30363d; }
@@ -375,7 +429,7 @@
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    padding: 16px 20px 10px;
+    padding: 15px 18px 10px;
     gap: 12px;
   }
 
@@ -390,28 +444,36 @@
     text-overflow: ellipsis;
   }
 
-  .ad-url {
+  .ad-display-url {
     font-family: var(--mono);
     font-size: 11px;
-    color: var(--muted);
-    margin-top: 3px;
+    color: var(--green);
+    margin-top: 2px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
 
-  .ad-url a {
-    color: inherit;
-    text-decoration: none;
+  .ad-landing-url {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    margin-top: 1px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  .ad-url a:hover { color: var(--accent); }
+  .ad-landing-url a { color: inherit; text-decoration: none; }
+  .ad-landing-url a:hover { color: var(--accent); }
 
   .badge-row {
     display: flex;
-    gap: 6px;
+    gap: 5px;
     align-items: center;
     flex-shrink: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
   }
 
   .badge {
@@ -420,62 +482,150 @@
     font-weight: 600;
     padding: 3px 9px;
     border-radius: 100px;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.4px;
+    white-space: nowrap;
   }
 
-  .badge-region {
-    background: #1a2332;
-    color: #60a5fa;
-    border: 1px solid #1e3a5f;
-  }
-
-  .badge-kw {
-    background: #1f1a2e;
-    color: #a78bfa;
-    border: 1px solid #3b2f6e;
-  }
-
+  .badge-region  { background: #1a2332; color: var(--blue);   border: 1px solid var(--blue-dim); }
+  .badge-kw      { background: #1f1a2e; color: var(--purple); border: 1px solid var(--purple-dim); }
+  .badge-pos     { background: #1a1a2e; color: #94a3b8;        border: 1px solid #2d3748; }
   .badge-risk-high   { background: var(--red-dim);    color: var(--red);    border: 1px solid #7f1d1d; }
   .badge-risk-medium { background: var(--yellow-dim); color: var(--yellow); border: 1px solid #713f12; }
   .badge-risk-low    { background: var(--green-dim);  color: var(--green);  border: 1px solid #14532d; }
 
-  /* ── Signals ─────────────────────────────────── */
+  /* Description */
+  .card-desc {
+    padding: 8px 18px 12px;
+    font-size: 12px;
+    color: #c9d1d9;
+    line-height: 1.65;
+  }
+
+  /* Signals */
   .card-signals {
-    padding: 0 20px 14px;
+    padding: 0 18px 10px;
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 5px;
   }
 
   .signal {
     font-size: 11px;
     font-family: var(--mono);
-    padding: 3px 10px;
+    padding: 3px 9px;
     border-radius: 4px;
     background: #1c1f26;
     border: 1px solid #21262d;
     color: var(--muted);
-    display: flex;
-    align-items: center;
-    gap: 5px;
   }
 
-  .signal.flag { color: var(--red); border-color: #3d1515; background: #1f1010; }
+  .signal.flag { color: var(--red);    border-color: #3d1515; background: #1f1010; }
   .signal.warn { color: var(--yellow); border-color: #3d3215; background: #1f1c10; }
   .signal.ok   { color: var(--green);  border-color: #153d1a; background: #101f12; }
 
-  /* ── Description ─────────────────────────────── */
-  .card-desc {
-    padding: 0 20px 16px;
-    font-size: 12px;
-    color: var(--muted);
-    line-height: 1.6;
+  /* Expandable: sitelinks, extensions, raw source */
+  .card-expand-row {
     border-top: 1px solid var(--border);
-    margin-top: 4px;
-    padding-top: 12px;
+    display: flex;
+    gap: 0;
   }
 
-  /* ── Empty / Error states ────────────────────── */
+  .expand-tab {
+    flex: 1;
+    background: none;
+    border: none;
+    border-right: 1px solid var(--border);
+    color: var(--muted);
+    font-family: var(--mono);
+    font-size: 11px;
+    padding: 8px 12px;
+    cursor: pointer;
+    transition: color .12s, background .12s;
+    text-align: left;
+  }
+
+  .expand-tab:last-child { border-right: none; }
+  .expand-tab:hover { color: var(--accent); background: #1a1a1a; }
+  .expand-tab.open  { color: var(--accent); background: #1a1010; }
+
+  .expand-body {
+    display: none;
+    padding: 12px 18px 14px;
+    border-top: 1px solid var(--border);
+    background: #0f1116;
+  }
+
+  .expand-body.visible { display: block; }
+
+  /* Sitelinks */
+  .sitelinks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 8px;
+  }
+
+  .sitelink-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+  }
+
+  .sitelink-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--blue);
+  }
+
+  .sitelink-title a { color: inherit; text-decoration: none; }
+  .sitelink-title a:hover { text-decoration: underline; }
+
+  .sitelink-desc {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+    line-height: 1.5;
+  }
+
+  .sitelink-url {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: #4a5568;
+    margin-top: 3px;
+    word-break: break-all;
+  }
+
+  /* Extensions */
+  .ext-list { display: flex; flex-direction: column; gap: 4px; }
+
+  .ext-row {
+    display: flex;
+    gap: 10px;
+    font-size: 12px;
+    font-family: var(--mono);
+  }
+
+  .ext-key { color: var(--muted); flex-shrink: 0; min-width: 120px; }
+  .ext-val { color: var(--text); word-break: break-all; }
+
+  /* Raw source */
+  .raw-source {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: #7dd3af;
+    background: #0a0d12;
+    border: 1px solid #21262d;
+    border-radius: 6px;
+    padding: 12px;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+    max-height: 320px;
+    overflow-y: auto;
+    line-height: 1.6;
+  }
+
+  /* Empty / error */
   .empty-state {
     text-align: center;
     padding: 60px 20px;
@@ -489,80 +639,22 @@
 
   .empty-icon { font-size: 36px; margin-bottom: 12px; }
 
-  .error-box {
-    background: var(--red-dim);
-    border: 1px solid var(--red);
-    border-radius: 8px;
-    padding: 14px 18px;
-    font-family: var(--mono);
-    font-size: 12px;
-    color: var(--red);
-    line-height: 1.6;
-  }
-
-  /* ── Setup Guide ─────────────────────────────── */
-  .setup-guide {
+  /* Setup callout */
+  .setup-callout {
     background: #111827;
     border: 1px solid #1f2937;
-    border-radius: 10px;
-    padding: 24px;
-  }
-
-  .setup-steps { display: flex; flex-direction: column; gap: 14px; margin-top: 14px; }
-
-  .step {
-    display: flex;
-    gap: 14px;
-    align-items: flex-start;
-  }
-
-  .step-num {
-    flex-shrink: 0;
-    width: 26px; height: 26px;
-    border-radius: 50%;
-    background: var(--accent-dim);
-    color: var(--accent);
-    font-family: var(--mono);
-    font-size: 12px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .step-text { font-size: 13px; line-height: 1.6; }
-  .step-text a { color: var(--accent); }
-  .step-text code {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 1px 6px;
-    font-family: var(--mono);
-    font-size: 12px;
-    color: #a78bfa;
-  }
-
-  /* ── Log ─────────────────────────────────────── */
-  #scan-log {
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--muted);
-    background: var(--bg);
-    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
     border-radius: 8px;
-    padding: 12px 14px;
-    line-height: 1.8;
-    max-height: 120px;
-    overflow-y: auto;
-    display: none;
+    padding: 14px 18px;
+    font-size: 13px;
+    line-height: 1.65;
+    color: #c9d1d9;
   }
 
-  #scan-log .log-ok  { color: var(--green); }
-  #scan-log .log-err { color: var(--red); }
-  #scan-log .log-info { color: #60a5fa; }
+  .setup-callout a { color: var(--accent); }
+  .setup-callout strong { color: var(--text); }
 
-  /* ── Scrollbar ───────────────────────────────── */
-  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar { width: 5px; height: 5px; }
   ::-webkit-scrollbar-track { background: var(--bg); }
   ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 </style>
@@ -573,83 +665,79 @@
   <div class="logo">
     <div class="logo-dot"></div>
     AdWatch
-    <span style="color:var(--muted);font-weight:400"> / Archies Brand Monitor</span>
   </div>
-  <div class="header-meta" id="last-scan-time">Never scanned</div>
+  <div class="header-right">
+    <div class="credits-badge" id="credits-badge" style="display:none">— credits left</div>
+    <div class="header-meta" id="last-scan-time">Never scanned</div>
+  </div>
 </header>
 
 <main>
 
-  <!-- Setup guide (shown when no API key) -->
-  <div class="setup-guide" id="setup-guide">
-    <div class="panel-title">⚡ Quick Setup — Get Your Free SerpAPI Key</div>
-    <div class="setup-steps">
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-text">Go to <a href="https://serpapi.com" target="_blank">serpapi.com</a> and create a free account. Free plan gives you <strong>100 searches/month</strong> — enough to monitor daily.</div>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-text">After signing in, copy your API key from the dashboard and paste it in the <code>SerpAPI Key</code> field below.</div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-text">Select your regions, confirm your keywords, and click <strong>Run Scan</strong>. Each scan uses <code>keywords × regions</code> API credits (e.g. 3 keywords × 3 regions = 9 credits).</div>
-      </div>
-    </div>
-  </div>
-
   <!-- Config -->
   <div class="panel">
     <div class="panel-title">Configuration</div>
+
     <div class="config-grid">
       <div class="field">
         <label>SerpAPI Key</label>
-        <input type="password" id="api-key" placeholder="Paste your key here…" />
+        <div class="api-key-row">
+          <input type="password" id="api-key" placeholder="Paste your key…" autocomplete="off" />
+          <button class="btn-icon" id="toggle-key" onclick="toggleKeyVisibility()" title="Show/hide key">👁</button>
+          <button class="btn-icon" onclick="clearApiKey()" title="Clear saved key">✕</button>
+        </div>
+        <div class="field-hint" id="key-status">Not saved</div>
       </div>
+
       <div class="field">
         <label>Your legitimate domain (whitelist)</label>
-        <input type="text" id="own-domain" value="archiesfootwear.com.au" />
+        <input type="text" id="own-domain" placeholder="e.g. archiesfootwear.com.au" />
+        <div class="field-hint">Ads from this domain are always marked Low Risk</div>
       </div>
     </div>
 
     <!-- Keywords -->
     <div style="margin-top:18px;">
-      <label style="font-size:11px;font-family:var(--mono);color:var(--muted);display:block;margin-bottom:8px;">Keywords to Monitor</label>
-      <div class="keywords-row" id="kw-list"></div>
+      <div style="font-size:11px;font-family:var(--mono);color:var(--muted);margin-bottom:8px;letter-spacing:.4px;">Keywords to Monitor</div>
+      <div class="kw-tags" id="kw-tags">
+        <span class="kw-empty" id="kw-empty">No keywords yet — add one below</span>
+      </div>
       <div class="kw-add-row">
-        <input type="text" id="kw-input" placeholder="Add keyword…" />
+        <input type="text" id="kw-input" placeholder="Type a keyword and press Enter or Add…" />
         <button class="btn-outline" onclick="addKeyword()">+ Add</button>
       </div>
     </div>
 
     <!-- Regions -->
     <div style="margin-top:18px;">
-      <label style="font-size:11px;font-family:var(--mono);color:var(--muted);display:block;margin-bottom:10px;">Active Regions</label>
+      <div style="font-size:11px;font-family:var(--mono);color:var(--muted);margin-bottom:10px;letter-spacing:.4px;">Regions to Scan</div>
       <div class="region-list" id="region-list"></div>
     </div>
   </div>
 
+  <!-- Setup callout shown if no key -->
+  <div class="setup-callout" id="setup-callout">
+    <strong>Need a SerpAPI key?</strong> Sign up free at <a href="https://serpapi.com" target="_blank">serpapi.com</a> — the free plan gives you 100 searches/month. Each scan uses <strong>keywords × regions</strong> credits. Your key is saved in your browser and never sent anywhere except directly to SerpAPI.
+  </div>
+
   <!-- Run -->
-  <div class="panel" style="padding:18px 24px;">
+  <div class="panel" style="padding:16px 22px;">
     <div class="run-row">
-      <button class="btn-run" id="run-btn" onclick="runScan()">
-        <span>▶</span> Run Scan
-      </button>
-      <button class="btn-outline" onclick="clearResults()">Clear Results</button>
+      <button class="btn-run" id="run-btn" onclick="runScan()">▶ Run Scan</button>
+      <button class="btn-outline" onclick="clearResults()">Clear</button>
       <div id="status-bar">
         <div class="spinner" id="spinner"></div>
         <span id="status-text">Ready</span>
       </div>
     </div>
-    <div id="scan-log" style="margin-top:14px;"></div>
+    <div id="scan-log"></div>
   </div>
 
-  <!-- Summary -->
-  <div class="summary-grid" id="summary-grid" style="display:none;">
+  <!-- Summary stats -->
+  <div class="summary-grid" id="summary-grid" style="display:none">
     <div class="stat-card danger">
       <div class="stat-num" id="s-high">0</div>
-      <div class="stat-label">HIGH RISK ADS</div>
+      <div class="stat-label">HIGH RISK</div>
     </div>
     <div class="stat-card warning">
       <div class="stat-num" id="s-med">0</div>
@@ -657,23 +745,23 @@
     </div>
     <div class="stat-card ok">
       <div class="stat-num" id="s-low">0</div>
-      <div class="stat-label">LOW RISK / LEGIT</div>
+      <div class="stat-label">LEGIT / LOW</div>
     </div>
     <div class="stat-card neutral">
       <div class="stat-num" id="s-total">0</div>
-      <div class="stat-label">TOTAL ADS FOUND</div>
+      <div class="stat-label">TOTAL ADS</div>
     </div>
   </div>
 
   <!-- Results -->
-  <div class="results-area" id="results-area" style="display:none;">
-    <div class="results-header">
+  <div id="results-area" style="display:none">
+    <div class="results-header" style="margin-bottom:12px;">
       <div class="panel-title" style="margin:0;">Scan Results</div>
-      <div class="filter-row" id="filter-row">
-        <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
-        <button class="filter-btn" onclick="setFilter('high', this)">🔴 High Risk</button>
-        <button class="filter-btn" onclick="setFilter('medium', this)">🟡 Medium</button>
-        <button class="filter-btn" onclick="setFilter('low', this)">🟢 Legit</button>
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+        <button class="filter-btn" onclick="setFilter('high',this)">🔴 High Risk</button>
+        <button class="filter-btn" onclick="setFilter('medium',this)">🟡 Medium</button>
+        <button class="filter-btn" onclick="setFilter('low',this)">🟢 Legit</button>
       </div>
     </div>
     <div id="results-list"></div>
@@ -682,72 +770,152 @@
 </main>
 
 <script>
-// ── State ──────────────────────────────────────────────────────
-const REGIONS = [
-  { code: 'AU', label: 'Australia', gl: 'au', hl: 'en', flag: '🇦🇺' },
-  { code: 'US', label: 'United States', gl: 'us', hl: 'en', flag: '🇺🇸' },
-  { code: 'CA', label: 'Canada', gl: 'ca', hl: 'en', flag: '🇨🇦' },
-  { code: 'GB', label: 'United Kingdom', gl: 'gb', hl: 'en', flag: '🇬🇧' },
-  { code: 'NZ', label: 'New Zealand', gl: 'nz', hl: 'en', flag: '🇳🇿' },
+// ─────────────────────────────────────────────────────────────
+// REGIONS
+// ─────────────────────────────────────────────────────────────
+const ALL_REGIONS = [
+  { code:'AU', label:'Australia',     gl:'au', hl:'en', flag:'🇦🇺' },
+  { code:'US', label:'United States', gl:'us', hl:'en', flag:'🇺🇸' },
+  { code:'CA', label:'Canada',        gl:'ca', hl:'en', flag:'🇨🇦' },
+  { code:'GB', label:'UK',            gl:'gb', hl:'en', flag:'🇬🇧' },
+  { code:'NZ', label:'New Zealand',   gl:'nz', hl:'en', flag:'🇳🇿' },
 ];
 
-let activeRegions = new Set(['AU', 'US', 'CA']);
-let keywords = ['archies footwear', 'archies flip flops', 'archies'];
-let allResults = [];
+// ─────────────────────────────────────────────────────────────
+// STATE — loaded from localStorage
+// ─────────────────────────────────────────────────────────────
+let keywords     = load('adwatch_keywords', []);
+let activeRegions = new Set(load('adwatch_regions', ['AU','US','CA']));
+let allResults   = [];
 let currentFilter = 'all';
+let expandState  = {}; // cardId -> which tab is open
 
-// ── Init ──────────────────────────────────────────────────────
+function load(key, fallback) {
+  try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+  catch { return fallback; }
+}
+
+function save(key, val) {
+  try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
+}
+
+// ─────────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────────
 function init() {
-  renderRegions();
-  renderKeywords();
+  // Restore API key
+  const savedKey = localStorage.getItem('adwatch_api_key');
+  if (savedKey) {
+    document.getElementById('api-key').value = savedKey;
+    document.getElementById('key-status').textContent = '✓ Saved in browser';
+    document.getElementById('key-status').style.color = 'var(--green)';
+    document.getElementById('setup-callout').style.display = 'none';
+    fetchCredits(savedKey);
+  }
 
+  // Restore own domain
+  const savedDomain = localStorage.getItem('adwatch_own_domain');
+  if (savedDomain) document.getElementById('own-domain').value = savedDomain;
+
+  // Listeners
+  document.getElementById('api-key').addEventListener('change', onApiKeyChange);
+  document.getElementById('own-domain').addEventListener('change', () => {
+    localStorage.setItem('adwatch_own_domain', document.getElementById('own-domain').value.trim());
+  });
   document.getElementById('kw-input').addEventListener('keydown', e => {
     if (e.key === 'Enter') addKeyword();
   });
 
-  const saved = localStorage.getItem('serpapi_key');
-  if (saved) {
-    document.getElementById('api-key').value = saved;
-    document.getElementById('setup-guide').style.display = 'none';
-  }
-
-  document.getElementById('api-key').addEventListener('input', () => {
-    const v = document.getElementById('api-key').value.trim();
-    if (v) document.getElementById('setup-guide').style.display = 'none';
-    else document.getElementById('setup-guide').style.display = '';
-  });
+  renderRegions();
+  renderKeywords();
 }
 
-// ── Regions ───────────────────────────────────────────────────
+function onApiKeyChange() {
+  const key = document.getElementById('api-key').value.trim();
+  if (key) {
+    localStorage.setItem('adwatch_api_key', key);
+    document.getElementById('key-status').textContent = '✓ Saved in browser';
+    document.getElementById('key-status').style.color = 'var(--green)';
+    document.getElementById('setup-callout').style.display = 'none';
+    fetchCredits(key);
+  } else {
+    localStorage.removeItem('adwatch_api_key');
+    document.getElementById('key-status').textContent = 'Not saved';
+    document.getElementById('key-status').style.color = '';
+    document.getElementById('credits-badge').style.display = 'none';
+  }
+}
+
+function clearApiKey() {
+  document.getElementById('api-key').value = '';
+  localStorage.removeItem('adwatch_api_key');
+  document.getElementById('key-status').textContent = 'Cleared';
+  document.getElementById('credits-badge').style.display = 'none';
+  document.getElementById('setup-callout').style.display = '';
+}
+
+function toggleKeyVisibility() {
+  const inp = document.getElementById('api-key');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+async function fetchCredits(apiKey) {
+  try {
+    const r = await fetch(`https://serpapi.com/account.json?api_key=${apiKey}`);
+    if (!r.ok) return;
+    const d = await r.json();
+    const left = d.plan_searches_left ?? d.searches_left;
+    if (left !== undefined) {
+      const el = document.getElementById('credits-badge');
+      el.textContent = `${left} credits left`;
+      el.style.display = '';
+    }
+  } catch {}
+}
+
+// ─────────────────────────────────────────────────────────────
+// REGIONS
+// ─────────────────────────────────────────────────────────────
 function renderRegions() {
   const el = document.getElementById('region-list');
-  el.innerHTML = REGIONS.map(r => `
+  el.innerHTML = ALL_REGIONS.map(r => `
     <button class="region-btn ${activeRegions.has(r.code) ? 'active' : ''}"
-            onclick="toggleRegion('${r.code}', this)">
-      <span class="flag">${r.flag}</span> ${r.label}
+            onclick="toggleRegion('${r.code}',this)">
+      <span class="flag">${r.flag}</span>${r.label}
     </button>
   `).join('');
 }
 
 function toggleRegion(code, btn) {
   if (activeRegions.has(code)) {
-    if (activeRegions.size === 1) return; // keep at least 1
+    if (activeRegions.size === 1) return;
     activeRegions.delete(code);
     btn.classList.remove('active');
   } else {
     activeRegions.add(code);
     btn.classList.add('active');
   }
+  save('adwatch_regions', [...activeRegions]);
 }
 
-// ── Keywords ──────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+// KEYWORDS
+// ─────────────────────────────────────────────────────────────
 function renderKeywords() {
-  const el = document.getElementById('kw-list');
+  const el = document.getElementById('kw-tags');
+  const empty = document.getElementById('kw-empty');
+  if (keywords.length === 0) {
+    el.innerHTML = '';
+    el.appendChild(empty);
+    empty.style.display = '';
+    return;
+  }
+  empty.style.display = 'none';
   el.innerHTML = keywords.map((kw, i) => `
-    <span class="kw-tag">${kw}
+    <span class="kw-tag">${escHtml(kw)}
       <button onclick="removeKeyword(${i})">×</button>
     </span>
-  `).join('');
+  `).join('') + `<span class="kw-empty" id="kw-empty" style="display:none"></span>`;
 }
 
 function addKeyword() {
@@ -755,78 +923,84 @@ function addKeyword() {
   const val = inp.value.trim().toLowerCase();
   if (val && !keywords.includes(val)) {
     keywords.push(val);
+    save('adwatch_keywords', keywords);
     renderKeywords();
   }
   inp.value = '';
+  inp.focus();
 }
 
 function removeKeyword(i) {
   keywords.splice(i, 1);
+  save('adwatch_keywords', keywords);
   renderKeywords();
 }
 
-// ── Risk Scoring ──────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+// RISK SCORING
+// ─────────────────────────────────────────────────────────────
 function scoreAd(ad, ownDomain, keyword) {
   const signals = [];
   let score = 0;
 
-  const domain = extractDomain(ad.displayed_link || ad.link || '');
-  const own = ownDomain.toLowerCase().replace(/^www\./, '');
+  const rawUrl = ad.link || ad.tracking_link || '';
+  const domain = extractDomain(ad.displayed_link || rawUrl);
+  const own = ownDomain.toLowerCase().replace(/^www\./,'');
 
-  // Own domain?
-  const isOwn = domain.includes(own);
-  if (isOwn) {
-    signals.push({ label: '✓ Your domain', type: 'ok' });
-    return { risk: 'low', score: 0, signals };
+  if (!own) {
+    // No whitelist set — can't check ownership
+  } else if (domain === own || domain.endsWith('.' + own)) {
+    signals.push({ label:'✓ Your domain', type:'ok' });
+    return { risk:'low', score:0, signals };
   }
 
-  // Typosquat check
-  const typo = isTyposquat(domain, own);
-  if (typo) {
-    signals.push({ label: `⚠ Typosquat: ${domain}`, type: 'flag' });
+  // Typosquat
+  if (own && isTyposquat(domain, own)) {
+    signals.push({ label:`⚠ Possible typosquat: ${domain}`, type:'flag' });
     score += 60;
   }
 
-  // Brand name in domain that isn't you
+  // Brand keywords in domain
   const kwWords = keyword.split(' ').filter(w => w.length > 3);
-  const hasBrandInDomain = kwWords.some(w => domain.includes(w));
-  if (hasBrandInDomain && !isOwn) {
-    signals.push({ label: '⚠ Brand name in domain', type: 'warn' });
+  if (kwWords.some(w => domain.includes(w))) {
+    signals.push({ label:'⚠ Brand term in domain', type:'warn' });
     score += 30;
   }
 
-  // No HTTPS
-  const href = ad.link || '';
-  if (href && !href.startsWith('https')) {
-    signals.push({ label: '✗ No HTTPS', type: 'flag' });
+  // HTTPS
+  if (rawUrl && !rawUrl.startsWith('https')) {
+    signals.push({ label:'✗ No HTTPS on landing URL', type:'flag' });
     score += 20;
-  } else if (href) {
-    signals.push({ label: '✓ HTTPS', type: 'ok' });
+  } else if (rawUrl) {
+    signals.push({ label:'✓ HTTPS', type:'ok' });
   }
 
-  // Known retailers — give partial pass
-  const knownRetailers = ['amazon', 'ebay', 'google', 'facebook', 'catch', 'kogan', 'myer', 'davidjones', 'theiconic'];
-  const isKnownRetailer = knownRetailers.some(r => domain.includes(r));
-  if (isKnownRetailer) {
-    signals.push({ label: '✓ Known retailer', type: 'ok' });
-    score = Math.max(0, score - 30);
+  // Known legit retailers
+  const known = ['amazon','ebay','google','facebook','catch','kogan','myer','davidjones','theiconic','walmart','target'];
+  if (known.some(r => domain.includes(r))) {
+    signals.push({ label:'✓ Known retailer', type:'ok' });
+    score = Math.max(0, score - 25);
   }
 
-  // Check for misleading ad text
-  const title = (ad.title || '').toLowerCase();
-  const desc  = (ad.description || '').toLowerCase();
-  const combined = title + ' ' + desc;
-  if (combined.includes('official') && !isOwn) {
-    signals.push({ label: '⚠ Claims "official"', type: 'flag' });
+  // Misleading copy
+  const txt = ((ad.title||'') + ' ' + (ad.description||'')).toLowerCase();
+  if (txt.includes('official') && own && !domain.includes(own)) {
+    signals.push({ label:'⚠ Claims "official"', type:'flag' });
     score += 25;
   }
-  if (combined.includes('free shipping') && !isOwn) {
-    signals.push({ label: 'ℹ Free shipping claim', type: 'warn' });
+  if (txt.includes('clearance') || txt.includes('closing down')) {
+    signals.push({ label:'ℹ Urgency/clearance language', type:'warn' });
+    score += 10;
   }
 
-  // Third-party seller
-  if (!isOwn && !isKnownRetailer && !typo) {
-    signals.push({ label: 'ℹ Third-party seller', type: 'warn' });
+  // Tracking redirect
+  if (ad.tracking_link && ad.tracking_link !== ad.link) {
+    signals.push({ label:'ℹ Has tracking redirect', type:'warn' });
+  }
+
+  // Third-party
+  if (own && !domain.includes(own) && !known.some(r => domain.includes(r))) {
+    signals.push({ label:'ℹ Third-party advertiser', type:'warn' });
     score += 10;
   }
 
@@ -835,178 +1009,270 @@ function scoreAd(ad, ownDomain, keyword) {
 }
 
 function extractDomain(url) {
+  if (!url) return '';
   try {
     return new URL(url.startsWith('http') ? url : 'https://' + url)
-      .hostname.replace(/^www\./, '').toLowerCase();
-  } catch { return url.toLowerCase(); }
+      .hostname.replace(/^www\./,'').toLowerCase();
+  } catch { return url.toLowerCase().split('/')[0].replace(/^www\./,''); }
 }
 
 function isTyposquat(domain, own) {
-  // Levenshtein distance check
-  const a = domain.replace(/\.(com|com\.au|co|org|net|au).*$/, '');
-  const b = own.replace(/\.(com|com\.au|co|org|net|au).*$/, '');
-  if (a === b) return false;
+  const a = domain.replace(/\.(com\.au|com|co\.uk|co|org|net|au|nz|ca).*$/, '');
+  const b = own.replace(/\.(com\.au|com|co\.uk|co|org|net|au|nz|ca).*$/, '');
+  if (a === b || a.length < 3 || b.length < 3) return false;
   if (Math.abs(a.length - b.length) > 4) return false;
-  return levenshtein(a, b) <= 2 && a !== b;
+  return levenshtein(a, b) <= 2;
 }
 
 function levenshtein(a, b) {
-  const dp = Array.from({length: b.length+1}, (_, i) => i);
+  const dp = Array.from({length: b.length+1}, (_,i) => i);
   for (let i = 1; i <= a.length; i++) {
     let prev = i;
     for (let j = 1; j <= b.length; j++) {
-      const val = a[i-1] === b[j-1] ? dp[j-1] : 1 + Math.min(dp[j-1], dp[j], prev);
-      dp[j-1] = prev;
-      prev = val;
+      const v = a[i-1]===b[j-1] ? dp[j-1] : 1+Math.min(dp[j-1],dp[j],prev);
+      dp[j-1] = prev; prev = v;
     }
     dp[b.length] = prev;
   }
   return dp[b.length];
 }
 
-// ── Scan ──────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+// SCAN
+// ─────────────────────────────────────────────────────────────
 async function runScan() {
   const apiKey = document.getElementById('api-key').value.trim();
-  if (!apiKey) {
-    alert('Please enter your SerpAPI key first.');
-    return;
-  }
-  if (keywords.length === 0) {
-    alert('Add at least one keyword to monitor.');
-    return;
-  }
+  if (!apiKey) { alert('Enter your SerpAPI key first.'); return; }
+  if (keywords.length === 0) { alert('Add at least one keyword.'); return; }
 
-  localStorage.setItem('serpapi_key', apiKey);
+  // Save on scan too
+  localStorage.setItem('adwatch_api_key', apiKey);
 
   const ownDomain = document.getElementById('own-domain').value.trim();
-  const regions = REGIONS.filter(r => activeRegions.has(r.code));
+  const regions   = ALL_REGIONS.filter(r => activeRegions.has(r.code));
 
   allResults = [];
+  expandState = {};
   setRunning(true);
   showLog(true);
   clearLog();
 
-  const combos = [];
-  for (const kw of keywords) {
-    for (const region of regions) {
-      combos.push({ kw, region });
-    }
-  }
-
-  log(`Starting scan: ${keywords.length} keywords × ${regions.length} regions = ${combos.length} queries`, 'info');
+  const combos = keywords.flatMap(kw => regions.map(region => ({ kw, region })));
+  log(`Scanning ${keywords.length} keywords × ${regions.length} regions = ${combos.length} queries`, 'info');
 
   let done = 0;
   for (const { kw, region } of combos) {
-    setStatus(`Scanning "${kw}" in ${region.label}… (${done+1}/${combos.length})`);
-    log(`→ Querying: "${kw}" [${region.code}]`, 'info');
+    setStatus(`"${kw}" in ${region.label} (${done+1}/${combos.length})…`);
+    log(`→ ${region.flag} "${kw}" [${region.code}]`, 'info');
 
     try {
-      const url = `https://serpapi.com/search.json?engine=google&q=${encodeURIComponent(kw)}&gl=${region.gl}&hl=${region.hl}&api_key=${apiKey}&num=10`;
+      // Request all ad fields: num=10, include sitelinks and extensions
+      const url = [
+        'https://serpapi.com/search.json',
+        `?engine=google`,
+        `&q=${encodeURIComponent(kw)}`,
+        `&gl=${region.gl}`,
+        `&hl=${region.hl}`,
+        `&num=10`,
+        `&api_key=${apiKey}`,
+      ].join('');
+
       const resp = await fetch(url);
 
       if (!resp.ok) {
-        const err = await resp.json().catch(() => ({}));
-        log(`✗ Error ${resp.status}: ${err.error || resp.statusText}`, 'err');
-        done++;
-        continue;
+        const err = await resp.json().catch(()=>({}));
+        log(`  ✗ ${resp.status}: ${err.error || resp.statusText}`, 'err');
+        if (resp.status === 401) {
+          log('  Invalid API key — check your key and try again.', 'err');
+          setRunning(false);
+          return;
+        }
+        done++; continue;
       }
 
       const data = await resp.json();
+
+      // SerpAPI returns ads under `ads` array
       const ads = data.ads || [];
 
       if (ads.length === 0) {
-        log(`  No ads found for "${kw}" in ${region.label}`, 'ok');
+        log(`  No ads found`, 'warn');
       } else {
-        log(`  Found ${ads.length} ad(s) for "${kw}" in ${region.label}`, 'ok');
+        log(`  ✓ ${ads.length} ad${ads.length>1?'s':''} found`, 'ok');
         for (const ad of ads) {
           const analysis = scoreAd(ad, ownDomain, kw);
           allResults.push({
-            title: ad.title || '(No title)',
-            url: ad.link || '',
-            displayUrl: ad.displayed_link || ad.link || '',
-            description: ad.description || '',
-            keyword: kw,
-            region: region,
+            // Core display fields
+            title:        ad.title || '(No title)',
+            displayUrl:   ad.displayed_link || '',
+            landingUrl:   ad.link || '',
+            trackingUrl:  ad.tracking_link || '',
+            description:  ad.description || '',
+            position:     ad.position ?? null,
+            // Sitelinks (inline + block)
+            sitelinks:    [...(ad.sitelinks?.inline || []), ...(ad.sitelinks?.block || [])],
+            // Extensions: callout, structured snippets, call extensions etc.
+            extensions:   extractExtensions(ad),
+            // Full raw object from SerpAPI (every field)
+            raw:          ad,
+            // Meta
+            keyword:      kw,
+            region:       region,
             ...analysis,
           });
         }
       }
-    } catch (e) {
-      log(`✗ Network error: ${e.message}`, 'err');
+    } catch(e) {
+      log(`  ✗ Network error: ${e.message}`, 'err');
     }
 
     done++;
-    // small delay to be kind to API
-    await sleep(300);
+    await sleep(250);
   }
 
-  log(`Scan complete. ${allResults.length} total ads found.`, 'ok');
+  log(`Done. ${allResults.length} total ad${allResults.length!==1?'s':''} found.`, 'ok');
   setRunning(false);
-  setStatus(`Scan complete — ${allResults.length} ads across ${combos.length} queries`);
-  document.getElementById('last-scan-time').textContent = `Last scan: ${new Date().toLocaleString()}`;
+  setStatus(`Complete — ${allResults.length} ads in ${combos.length} queries`);
+  document.getElementById('last-scan-time').textContent = `Last scan: ${new Date().toLocaleTimeString()}`;
+  fetchCredits(apiKey);
   renderResults();
+}
+
+// Pull any extra extension-type fields from an ad object
+function extractExtensions(ad) {
+  const exts = [];
+  if (ad.phone)           exts.push({ key: 'Phone', val: ad.phone });
+  if (ad.rating)          exts.push({ key: 'Rating', val: `${ad.rating.value} ★ (${ad.rating.count} reviews)` });
+  if (ad.price)           exts.push({ key: 'Price', val: ad.price });
+  if (ad.snippet)         exts.push({ key: 'Snippet', val: ad.snippet });
+  if (ad.callouts?.length)      exts.push({ key: 'Callouts', val: ad.callouts.join(' · ') });
+  if (ad.structured_snippets?.length) {
+    ad.structured_snippets.forEach(s => {
+      exts.push({ key: s.header || 'Structured', val: (s.values || []).join(', ') });
+    });
+  }
+  if (ad.extensions?.length) {
+    ad.extensions.forEach(e => exts.push({ key: 'Extension', val: typeof e === 'string' ? e : JSON.stringify(e) }));
+  }
+  return exts;
 }
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-// ── Render Results ────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+// RENDER
+// ─────────────────────────────────────────────────────────────
 function renderResults() {
-  const high   = allResults.filter(r => r.risk === 'high').length;
-  const medium = allResults.filter(r => r.risk === 'medium').length;
-  const low    = allResults.filter(r => r.risk === 'low').length;
-
-  document.getElementById('s-high').textContent  = high;
-  document.getElementById('s-med').textContent   = medium;
-  document.getElementById('s-low').textContent   = low;
+  document.getElementById('s-high').textContent  = allResults.filter(r=>r.risk==='high').length;
+  document.getElementById('s-med').textContent   = allResults.filter(r=>r.risk==='medium').length;
+  document.getElementById('s-low').textContent   = allResults.filter(r=>r.risk==='low').length;
   document.getElementById('s-total').textContent = allResults.length;
-
   document.getElementById('summary-grid').style.display = '';
   document.getElementById('results-area').style.display = '';
-
   renderList();
 }
 
 function renderList() {
   const list = document.getElementById('results-list');
-  const filtered = allResults.filter(r =>
-    currentFilter === 'all' || r.risk === currentFilter
-  );
+  const filtered = allResults.filter(r => currentFilter==='all' || r.risk===currentFilter);
 
   if (filtered.length === 0) {
-    list.innerHTML = `
-      <div class="empty-state">
-        <div class="empty-icon">🔍</div>
-        No results match this filter.
-      </div>`;
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">🔍</div>No results match this filter.</div>`;
     return;
   }
 
-  // Sort by risk score descending
-  const sorted = [...filtered].sort((a, b) => b.score - a.score);
+  const sorted = [...filtered].sort((a,b) => b.score - a.score);
+  list.innerHTML = sorted.map((r, idx) => buildCard(r, idx)).join('');
+}
 
-  list.innerHTML = sorted.map(r => `
-    <div class="result-card risk-${r.risk}">
-      <div class="card-head">
-        <div class="card-head-left">
-          <div class="ad-title">${escHtml(r.title)}</div>
-          <div class="ad-url">
-            <a href="${escHtml(r.url)}" target="_blank" rel="noopener">${escHtml(r.displayUrl)}</a>
-          </div>
-        </div>
-        <div class="badge-row">
-          <span class="badge badge-region">${r.region.flag} ${r.region.code}</span>
-          <span class="badge badge-kw">${escHtml(r.keyword)}</span>
-          <span class="badge badge-risk-${r.risk}">${r.risk.toUpperCase()}</span>
-        </div>
-      </div>
-      ${r.signals.length > 0 ? `
-      <div class="card-signals">
-        ${r.signals.map(s => `<span class="signal ${s.type}">${s.label}</span>`).join('')}
-      </div>` : ''}
-      ${r.description ? `
-      <div class="card-desc">${escHtml(r.description)}</div>` : ''}
+function buildCard(r, idx) {
+  const hasSitelinks  = r.sitelinks.length > 0;
+  const hasExtensions = r.extensions.length > 0;
+
+  const tabsHtml = (hasSitelinks || hasExtensions) ? `
+    <div class="card-expand-row">
+      ${hasSitelinks  ? `<button class="expand-tab" onclick="toggleTab(${idx},'sitelinks',this)">🔗 Sitelinks (${r.sitelinks.length})</button>` : ''}
+      ${hasExtensions ? `<button class="expand-tab" onclick="toggleTab(${idx},'extensions',this)">📋 Extensions (${r.extensions.length})</button>` : ''}
+      <button class="expand-tab" onclick="toggleTab(${idx},'raw',this)">{ } Raw Source</button>
     </div>
-  `).join('');
+    ${hasSitelinks ? `
+    <div class="expand-body" id="exp-${idx}-sitelinks">
+      <div class="sitelinks-grid">
+        ${r.sitelinks.map(sl => `
+          <div class="sitelink-item">
+            <div class="sitelink-title"><a href="${escHtml(sl.link||'#')}" target="_blank" rel="noopener">${escHtml(sl.title||sl.text||'Link')}</a></div>
+            ${sl.snippet ? `<div class="sitelink-desc">${escHtml(sl.snippet)}</div>` : ''}
+            ${sl.link ? `<div class="sitelink-url">${escHtml(sl.link)}</div>` : ''}
+          </div>
+        `).join('')}
+      </div>
+    </div>` : ''}
+    ${hasExtensions ? `
+    <div class="expand-body" id="exp-${idx}-extensions">
+      <div class="ext-list">
+        ${r.extensions.map(e => `
+          <div class="ext-row">
+            <span class="ext-key">${escHtml(e.key)}</span>
+            <span class="ext-val">${escHtml(e.val)}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>` : ''}
+    <div class="expand-body" id="exp-${idx}-raw">
+      <div class="raw-source">${escHtml(JSON.stringify(r.raw, null, 2))}</div>
+    </div>
+  ` : `
+    <div class="card-expand-row">
+      <button class="expand-tab" onclick="toggleTab(${idx},'raw',this)">{ } Raw Source</button>
+    </div>
+    <div class="expand-body" id="exp-${idx}-raw">
+      <div class="raw-source">${escHtml(JSON.stringify(r.raw, null, 2))}</div>
+    </div>
+  `;
+
+  return `
+  <div class="result-card risk-${r.risk}">
+    <div class="card-head">
+      <div class="card-head-left">
+        <div class="ad-title">${escHtml(r.title)}</div>
+        <div class="ad-display-url">${escHtml(r.displayUrl)}</div>
+        ${r.landingUrl ? `<div class="ad-landing-url">↳ <a href="${escHtml(r.landingUrl)}" target="_blank" rel="noopener">${escHtml(r.landingUrl)}</a></div>` : ''}
+        ${r.trackingUrl && r.trackingUrl !== r.landingUrl ? `<div class="ad-landing-url" style="color:#4a5568">⟳ ${escHtml(r.trackingUrl)}</div>` : ''}
+      </div>
+      <div class="badge-row">
+        ${r.position !== null ? `<span class="badge badge-pos">Pos ${r.position}</span>` : ''}
+        <span class="badge badge-region">${r.region.flag} ${r.region.code}</span>
+        <span class="badge badge-kw">${escHtml(r.keyword)}</span>
+        <span class="badge badge-risk-${r.risk}">${r.risk.toUpperCase()}</span>
+      </div>
+    </div>
+    ${r.description ? `<div class="card-desc">${escHtml(r.description)}</div>` : ''}
+    ${r.signals.length > 0 ? `
+    <div class="card-signals">
+      ${r.signals.map(s => `<span class="signal ${s.type}">${s.label}</span>`).join('')}
+    </div>` : ''}
+    ${tabsHtml}
+  </div>`;
+}
+
+function toggleTab(idx, tab, btn) {
+  const bodyId = `exp-${idx}-${tab}`;
+  const body   = document.getElementById(bodyId);
+  if (!body) return;
+
+  // Close all tabs on this card first
+  const card = btn.closest('.result-card');
+  card.querySelectorAll('.expand-body').forEach(el => el.classList.remove('visible'));
+  card.querySelectorAll('.expand-tab').forEach(el => el.classList.remove('open'));
+
+  const key = `${idx}-${tab}`;
+  if (expandState[key]) {
+    delete expandState[key]; // was open, now closed
+  } else {
+    expandState[key] = true;
+    body.classList.add('visible');
+    btn.classList.add('open');
+  }
 }
 
 function setFilter(f, btn) {
@@ -1018,45 +1284,42 @@ function setFilter(f, btn) {
 
 function clearResults() {
   allResults = [];
+  expandState = {};
   currentFilter = 'all';
   document.getElementById('summary-grid').style.display = 'none';
   document.getElementById('results-area').style.display = 'none';
-  document.getElementById('results-list').innerHTML = '';
   document.getElementById('scan-log').style.display = 'none';
   setStatus('Ready');
 }
 
-// ── Helpers ───────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+// HELPERS
+// ─────────────────────────────────────────────────────────────
 function setRunning(on) {
   document.getElementById('run-btn').disabled = on;
   document.getElementById('spinner').style.display = on ? '' : 'none';
 }
 
-function setStatus(msg) {
-  document.getElementById('status-text').textContent = msg;
-}
+function setStatus(msg) { document.getElementById('status-text').textContent = msg; }
 
 function showLog(on) {
   document.getElementById('scan-log').style.display = on ? '' : 'none';
 }
 
-function clearLog() {
-  document.getElementById('scan-log').innerHTML = '';
-}
+function clearLog() { document.getElementById('scan-log').innerHTML = ''; }
 
-function log(msg, type = '') {
+function log(msg, type='') {
   const el = document.getElementById('scan-log');
-  const cls = type === 'err' ? 'log-err' : type === 'ok' ? 'log-ok' : type === 'info' ? 'log-info' : '';
+  const cls = {err:'log-err', ok:'log-ok', info:'log-info', warn:'log-warn'}[type] || '';
   el.innerHTML += `<div class="${cls}">${escHtml(msg)}</div>`;
   el.scrollTop = el.scrollHeight;
+  if (el.style.display === 'none') el.style.display = '';
 }
 
 function escHtml(s) {
   return String(s)
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;');
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 init();
