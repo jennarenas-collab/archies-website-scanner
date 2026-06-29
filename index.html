@@ -718,12 +718,15 @@
   <!-- Setup callout shown if no key -->
   <div class="setup-callout" id="setup-callout">
     <strong>Need a SerpAPI key?</strong> Sign up free at <a href="https://serpapi.com" target="_blank">serpapi.com</a> — the free plan gives you 100 searches/month. Each scan uses <strong>keywords × regions</strong> credits. Your key is saved in your browser and never sent anywhere except directly to SerpAPI.
+    <br><br>
+    <strong>Not seeing ads?</strong> Google only shows ads when budgets are active — try scanning during business hours (9am–6pm) in the target region's timezone. You can also test a query directly at <a href="https://serpapi.com/playground" target="_blank">serpapi.com/playground</a> to confirm what's being returned.
   </div>
 
   <!-- Run -->
   <div class="panel" style="padding:16px 22px;">
     <div class="run-row">
       <button class="btn-run" id="run-btn" onclick="runScan()">▶ Run Scan</button>
+      <button class="btn-outline" onclick="testApiKey()">⚡ Test Key</button>
       <button class="btn-outline" onclick="clearResults()">Clear</button>
       <div id="status-bar">
         <div class="spinner" id="spinner"></div>
@@ -774,11 +777,11 @@
 // REGIONS
 // ─────────────────────────────────────────────────────────────
 const ALL_REGIONS = [
-  { code:'AU', label:'Australia',     gl:'au', hl:'en', flag:'🇦🇺' },
-  { code:'US', label:'United States', gl:'us', hl:'en', flag:'🇺🇸' },
-  { code:'CA', label:'Canada',        gl:'ca', hl:'en', flag:'🇨🇦' },
-  { code:'GB', label:'UK',            gl:'gb', hl:'en', flag:'🇬🇧' },
-  { code:'NZ', label:'New Zealand',   gl:'nz', hl:'en', flag:'🇳🇿' },
+  { code:'AU', label:'Australia',     gl:'au', hl:'en', flag:'🇦🇺', location:'Sydney,New South Wales,Australia' },
+  { code:'US', label:'United States', gl:'us', hl:'en', flag:'🇺🇸', location:'New York,New York,United States' },
+  { code:'CA', label:'Canada',        gl:'ca', hl:'en', flag:'🇨🇦', location:'Toronto,Ontario,Canada' },
+  { code:'GB', label:'UK',            gl:'gb', hl:'en', flag:'🇬🇧', location:'London,England,United Kingdom' },
+  { code:'NZ', label:'New Zealand',   gl:'nz', hl:'en', flag:'🇳🇿', location:'Auckland,Auckland,New Zealand' },
 ];
 
 // ─────────────────────────────────────────────────────────────
@@ -1066,24 +1069,26 @@ async function runScan() {
     log(`→ ${region.flag} "${kw}" [${region.code}]`, 'info');
 
     try {
-      // Request all ad fields: num=10, include sitelinks and extensions
-      const url = [
-        'https://serpapi.com/search.json',
-        `?engine=google`,
-        `&q=${encodeURIComponent(kw)}`,
-        `&gl=${region.gl}`,
-        `&hl=${region.hl}`,
-        `&num=10`,
-        `&api_key=${apiKey}`,
-      ].join('');
+      // location= is critical — gl= alone routes to a neutral datacenter.
+      // A named city string triggers real local ad auctions.
+      const params = new URLSearchParams({
+        engine:   'google',
+        q:        kw,
+        gl:       region.gl,
+        hl:       region.hl,
+        location: region.location,
+        device:   'desktop',
+        api_key:  apiKey,
+      });
+      const url = `https://serpapi.com/search.json?${params}`;
 
       const resp = await fetch(url);
 
       if (!resp.ok) {
         const err = await resp.json().catch(()=>({}));
-        log(`  ✗ ${resp.status}: ${err.error || resp.statusText}`, 'err');
+        log(`  ✗ HTTP ${resp.status}: ${err.error || resp.statusText}`, 'err');
         if (resp.status === 401) {
-          log('  Invalid API key — check your key and try again.', 'err');
+          log('  ✗ Invalid API key — double-check it at serpapi.com/manage-api-key', 'err');
           setRunning(false);
           return;
         }
@@ -1092,32 +1097,46 @@ async function runScan() {
 
       const data = await resp.json();
 
-      // SerpAPI returns ads under `ads` array
-      const ads = data.ads || [];
+      // Debug: log which top-level result keys came back
+      const topKeys = Object.keys(data).filter(k =>
+        !['search_metadata','search_parameters','search_information','serpapi_pagination'].includes(k)
+      );
+      log(`  ↳ Response keys: [${topKeys.join(', ')}]`, 'info');
 
-      if (ads.length === 0) {
-        log(`  No ads found`, 'warn');
+      // Collect ads from all possible locations SerpAPI may place them
+      const ads = [
+        ...(data.ads        || []),
+        ...(data.top_ads    || []),
+        ...(data.bottom_ads || []),
+      ];
+
+      // Deduplicate by landing URL
+      const seen = new Set();
+      const uniqueAds = ads.filter(ad => {
+        const key = ad.link || ad.title || JSON.stringify(ad);
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+
+      if (uniqueAds.length === 0) {
+        log(`  ⚠ No ads — Google may not be running ads for this keyword/region right now. Try again later or check serpapi.com playground.`, 'warn');
       } else {
-        log(`  ✓ ${ads.length} ad${ads.length>1?'s':''} found`, 'ok');
-        for (const ad of ads) {
+        log(`  ✓ ${uniqueAds.length} ad${uniqueAds.length > 1 ? 's' : ''} found`, 'ok');
+        for (const ad of uniqueAds) {
           const analysis = scoreAd(ad, ownDomain, kw);
           allResults.push({
-            // Core display fields
-            title:        ad.title || '(No title)',
-            displayUrl:   ad.displayed_link || '',
-            landingUrl:   ad.link || '',
-            trackingUrl:  ad.tracking_link || '',
-            description:  ad.description || '',
-            position:     ad.position ?? null,
-            // Sitelinks (inline + block)
-            sitelinks:    [...(ad.sitelinks?.inline || []), ...(ad.sitelinks?.block || [])],
-            // Extensions: callout, structured snippets, call extensions etc.
-            extensions:   extractExtensions(ad),
-            // Full raw object from SerpAPI (every field)
-            raw:          ad,
-            // Meta
-            keyword:      kw,
-            region:       region,
+            title:       ad.title || '(No title)',
+            displayUrl:  ad.displayed_link || '',
+            landingUrl:  ad.link || '',
+            trackingUrl: ad.tracking_link || '',
+            description: ad.description || '',
+            position:    ad.position ?? null,
+            sitelinks:   [...(ad.sitelinks?.inline || []), ...(ad.sitelinks?.block || [])],
+            extensions:  extractExtensions(ad),
+            raw:         ad,
+            keyword:     kw,
+            region:      region,
             ...analysis,
           });
         }
@@ -1158,6 +1177,49 @@ function extractExtensions(ad) {
 }
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+  const apiKey = document.getElementById('api-key').value.trim();
+  if (!apiKey) { alert('Paste your SerpAPI key first.'); return; }
+
+  showLog(true);
+  clearLog();
+  log('Testing API key…', 'info');
+
+  try {
+    const r = await fetch(`https://serpapi.com/account.json?api_key=${apiKey}`);
+    if (!r.ok) {
+      const e = await r.json().catch(()=>({}));
+      log(`✗ Key invalid (${r.status}): ${e.error || r.statusText}`, 'err');
+      return;
+    }
+    const d = await r.json();
+    log(`✓ Key valid — Account: ${d.account_email || d.email || '(unknown)'}`, 'ok');
+    log(`  Plan: ${d.plan_name || 'unknown'} | Credits left: ${d.plan_searches_left ?? d.searches_left ?? '?'}`, 'ok');
+    log(`  Total searches used: ${d.total_searches_done ?? '?'}`, 'info');
+
+    // Now run a quick single test query to confirm ads come back
+    log('Running test query: "buy shoes" in Australia…', 'info');
+    const params = new URLSearchParams({
+      engine: 'google', q: 'buy shoes', gl: 'au', hl: 'en',
+      location: 'Sydney,New South Wales,Australia', device: 'desktop', api_key: apiKey,
+    });
+    const r2 = await fetch(`https://serpapi.com/search.json?${params}`);
+    const d2 = await r2.json();
+    const testAds = [...(d2.ads||[]), ...(d2.top_ads||[]), ...(d2.bottom_ads||[])];
+    const keys2 = Object.keys(d2).filter(k => !['search_metadata','search_parameters','search_information'].includes(k));
+    log(`  Response keys: [${keys2.join(', ')}]`, 'info');
+    if (testAds.length > 0) {
+      log(`  ✓ ${testAds.length} test ads returned — API is working correctly!`, 'ok');
+      log(`  If your keywords show no ads, Google simply isn't running ads for them right now.`, 'warn');
+    } else {
+      log(`  ⚠ No ads even for "buy shoes" — this is unusual.`, 'warn');
+      log(`  Check serpapi.com/playground with location=Sydney,New South Wales,Australia`, 'warn');
+    }
+  } catch(e) {
+    log(`✗ Network error: ${e.message}`, 'err');
+  }
+}
+
+
 
 // ─────────────────────────────────────────────────────────────
 // RENDER
